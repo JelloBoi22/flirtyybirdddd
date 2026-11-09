@@ -1,0 +1,832 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Flappy Heart ❤️</title>
+
+<!-- PREMIUM CUTE FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg,#ffe0eb,#ffd0e2,#fff0f5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Quicksand', sans-serif;
+    overflow: hidden;
+    color: #a83262;
+}
+
+.container {
+    width: min(94vw,430px);
+    text-align: center;
+}
+
+h1 {
+    font-family: 'Fredoka', sans-serif;
+    color: #e83e7b;
+    font-size: 35px;
+    font-weight: 700;
+    text-shadow: 2px 3px white;
+    margin-bottom: 3px;
+}
+
+.subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.caption {
+    background: white;
+    border: 2px dashed #ff82aa;
+    padding: 12px 8px;
+    border-radius: 16px;
+    color: #e83e7b;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px #d76b9630;
+}
+
+.game-box {
+    position: relative;
+    width: 100%;
+    height: min(65vh,570px);
+    min-height: 390px;
+    overflow: hidden;
+    border: 5px solid white;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px #d77b9b55;
+    background: #ffcce0;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: manipulation;
+}
+
+.hud {
+    position: absolute;
+    top: 12px;
+    width: 100%;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: #b52f65;
+    text-shadow: 1px 2px white;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: #fff0f2e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 5;
+}
+
+.panel {
+    background: white;
+    width: 100%;
+    padding: 25px 18px;
+    border-radius: 24px;
+    box-shadow: 0 5px 20px #d86d9850;
+}
+
+.panel h2 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 28px;
+    color: #e94f83;
+    margin-bottom: 12px;
+}
+
+.panel p {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.8;
+    color: #91506b;
+    margin-bottom: 18px;
+}
+
+button {
+    font-family: 'Fredoka', sans-serif;
+    background: linear-gradient(135deg,#ff77a7,#e83e7b);
+    border: none;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 14px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 12px #e83e7b50;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px #e83e7b50;
+}
+
+button:active {
+    transform: scale(.94);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.footer {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 12px;
+    color: #b75b7e;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>❤️ FLAPPY HEART ❤️</h1>
+<div class="subtitle">A little game made with lots of love.</div>
+
+<div class="caption">
+    💋 Pag natalo ka, kiss moko.<br>
+    Pag nanalo ka, kiss moko. HAHAHAHA! 😘
+</div>
+
+<div class="game-box">
+
+<canvas id="game"></canvas>
+
+<div class="hud">
+    SCORE: <span id="score">0</span> / 10
+</div>
+
+<!-- START SCREEN -->
+<div class="overlay" id="startScreen">
+    <div class="panel">
+        <h2>Hiiii, Darleng! 💗</h2>
+        <p>
+            Welcome to your very own love game! 🥰<br><br>
+            Avoid the obstacles and try to reach
+            10 points!<br><br>
+            Pero may warning ako...<br>
+            <b>Walang takas sa kisses ko. HAHAHA! 😘</b>
+        </p>
+        <button onclick="startGame()">START GAME 💕</button>
+    </div>
+</div>
+
+<!-- GAME OVER -->
+<div class="overlay hidden" id="gameOver">
+    <div class="panel">
+        <h2>GAME OVER! 😭</h2>
+        <p>
+            Ayieee, talo ka na! HAHAHA!<br><br>
+            Kahit ilang beses kang matalo,
+            ikaw pa rin ang winner sa puso ko.<br><br>
+            <b>Now, where's my kiss? 💋</b>
+        </p>
+        <button onclick="startGame()">TRY AGAIN 💗</button>
+    </div>
+</div>
+
+<!-- WIN -->
+<div class="overlay hidden" id="winScreen">
+    <div class="panel">
+        <h2>YOU WIN, DARLENG! 🏆</h2>
+        <p>
+            CONGRATULATIONS, MY LOVE! 💖<br><br>
+            You survived all the obstacles!<br><br>
+            Pero may reward ka pa rin...<br><br>
+            <b>Panalo ka na, kiss pa rin ang bayad! HAHAHA! 💋</b><br><br>
+            Happy Monthsary, my favorite person! 🥹
+        </p>
+        <button onclick="showLetter()">OPEN YOUR GIFT 💌</button>
+    </div>
+</div>
+
+<!-- LOVE LETTER -->
+<div class="overlay hidden" id="letterScreen">
+    <div class="panel">
+        <h2>To My Darleng 💌</h2>
+        <p>
+            Hiiii, my bebi! ❤️<br><br>
+            Happy Monthsary sa atin! Another month,
+            another collection of memories and reasons
+            to love you even more.<br><br>
+            Thank you for being my happiness,
+            my comfort, and my favorite person.<br><br>
+            I may not be perfect, but I promise
+            to keep choosing you every single day.<br><br>
+            No matter what happens, ikaw at ikaw
+            pa rin ang gusto ko.<br><br>
+            <b>I love you endlessly, my Beyaa ko! 🥺❤️</b><br><br>
+            Here's to more months, memories,
+            laughter, and kisses with you! 💋
+        </p>
+        <button onclick="closeLetter()">I LOVE YOU TOO 💗</button>
+    </div>
+</div>
+
+</div>
+
+<div class="footer">
+    TAP / CLICK / PRESS SPACE TO FLY ❤️
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   GAME SETUP
+========================= */
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const scoreText = document.getElementById("score");
+
+const startScreen = document.getElementById("startScreen");
+const gameOverScreen = document.getElementById("gameOver");
+const winScreen = document.getElementById("winScreen");
+const letterScreen = document.getElementById("letterScreen");
+
+let W, H;
+
+function resize() {
+    const rect = canvas.getBoundingClientRect();
+
+    W = rect.width;
+    H = rect.height;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+resize();
+window.addEventListener("resize", resize);
+
+let player;
+let obstacles = [];
+let particles = [];
+
+let score = 0;
+let frame = 0;
+let gameRunning = false;
+let animationId = null;
+
+const WIN_SCORE = 10;
+const GRAVITY = 0.38;
+const JUMP = -6.8;
+
+/* =========================
+   PERSONALIZED OBSTACLES
+========================= */
+
+const loveWords = [
+    "MY ELYEN ❤️",
+    "MY BADJAO 💗",
+    "MY NIGUGU 🥺",
+    "MY BEBI 💕",
+    "MY DARLENG 💍",
+    "MY BEYANTOT 😭",
+    "BEABADOObAI 💖"
+];
+
+const sweetMessages = [
+    "STILL MY ELYEN ❤️",
+    "MY BADJAO FOREVER",
+    "MY NIGUGU 🥺",
+    "MY BEBI LANG",
+    "WALANG TAKAS 😘",
+    "MY DARLENG FOREVER",
+    "BEABADOObAI 💗"
+];
+
+/* =========================
+   SOUND EFFECTS
+========================= */
+
+let audioCtx;
+
+function sound(freq=600,duration=0.1) {
+    try {
+        if (!audioCtx) {
+            audioCtx = new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+        }
+
+        if (audioCtx.state==="suspended") {
+            audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type="sine";
+        osc.frequency.value=freq;
+
+        gain.gain.setValueAtTime(
+            0.12,audioCtx.currentTime
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            0.001,
+            audioCtx.currentTime+duration
+        );
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime+duration);
+    } catch(e) {}
+}
+
+function playClick() {
+    sound(750,0.08);
+}
+
+function playScore() {
+    sound(900,0.1);
+    setTimeout(()=>sound(1100,0.12),90);
+}
+
+function playCrash() {
+    sound(250,0.25);
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+function createPlayer() {
+    return {
+        x: W*0.25,
+        y: H*0.45,
+        size: 19,
+        velocity: 0
+    };
+}
+
+function drawHeart(x,y,size) {
+    ctx.save();
+    ctx.translate(x,y);
+
+    ctx.font=`${size*2}px Arial`;
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.shadowColor="#ff4f89";
+    ctx.shadowBlur=12;
+
+    ctx.fillText("❤️",0,0);
+    ctx.restore();
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+function drawBackground() {
+    const gradient=ctx.createLinearGradient(0,0,0,H);
+
+    gradient.addColorStop(0,"#ffc5dd");
+    gradient.addColorStop(1,"#fff0f5");
+
+    ctx.fillStyle=gradient;
+    ctx.fillRect(0,0,W,H);
+
+    for(let i=0;i<12;i++) {
+        let x=(i*83+frame*0.25)%W;
+        let y=(i*67)%H;
+
+        ctx.globalAlpha=0.35;
+        ctx.font="18px Arial";
+        ctx.fillText("♥",x,y);
+    }
+
+    ctx.globalAlpha=1;
+    ctx.fillStyle="#ffffff75";
+
+    for(let i=0;i<4;i++) {
+        let x=(i*145-frame*0.35)%(W+100);
+
+        if(x < -60) x+=W+100;
+
+        let y=100+i*105;
+
+        ctx.beginPath();
+        ctx.arc(x,y,20,0,Math.PI*2);
+        ctx.arc(x+20,y-10,24,0,Math.PI*2);
+        ctx.arc(x+43,y,20,0,Math.PI*2);
+        ctx.fill();
+    }
+}
+
+/* =========================
+   PREMIUM OBSTACLE DESIGN
+========================= */
+
+function drawObstacle(o) {
+    const bottomY=o.top+o.gap;
+
+    const gradient=ctx.createLinearGradient(
+        o.x,0,o.x+o.width,0
+    );
+
+    gradient.addColorStop(0,"#ff6f9f");
+    gradient.addColorStop(0.5,"#ff9cbd");
+    gradient.addColorStop(1,"#ed5289");
+
+    ctx.fillStyle=gradient;
+
+    ctx.fillRect(o.x,0,o.width,o.top);
+
+    ctx.fillRect(
+        o.x,
+        bottomY,
+        o.width,
+        H-bottomY
+    );
+
+    // White borders
+    ctx.fillStyle="#ffffff";
+
+    ctx.fillRect(o.x,o.top-7,o.width,7);
+    ctx.fillRect(o.x,bottomY,o.width,7);
+
+    ctx.save();
+
+    // Decorative hearts
+    ctx.fillStyle="#ffffffaa";
+    ctx.font="14px Arial";
+    ctx.textAlign="center";
+
+    ctx.fillText(
+        "♥",
+        o.x+o.width/2,
+        o.top-15
+    );
+
+    ctx.fillText(
+        "♥",
+        o.x+o.width/2,
+        bottomY+24
+    );
+
+    // Premium typography
+    ctx.font="700 13px Fredoka, sans-serif";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.shadowColor="#a52b5d";
+    ctx.shadowBlur=5;
+
+    ctx.lineWidth=3;
+    ctx.strokeStyle="#d94378";
+    ctx.fillStyle="#ffffff";
+
+    const topY=Math.max(25,o.top/2);
+    const bottomTextY=bottomY+(H-bottomY)/2;
+
+    // Top text
+    ctx.strokeText(
+        o.word,
+        o.x+o.width/2,
+        topY,
+        o.width-8
+    );
+
+    ctx.fillText(
+        o.word,
+        o.x+o.width/2,
+        topY,
+        o.width-8
+    );
+
+    // Bottom text
+    ctx.strokeText(
+        o.bottomWord,
+        o.x+o.width/2,
+        bottomTextY,
+        o.width-8
+    );
+
+    ctx.fillText(
+        o.bottomWord,
+        o.x+o.width/2,
+        bottomTextY,
+        o.width-8
+    );
+
+    ctx.restore();
+}
+
+/* =========================
+   CREATE OBSTACLES
+========================= */
+
+function createObstacle() {
+    const gap=175;
+    const padding=75;
+
+    const topHeight=
+        padding+Math.random()*(H-gap-padding*2);
+
+    const word=
+        loveWords[Math.floor(Math.random()*loveWords.length)];
+
+    const bottomWord=
+        sweetMessages[Math.floor(Math.random()*sweetMessages.length)];
+
+    obstacles.push({
+        x:W+20,
+        top:topHeight,
+        gap:gap,
+        width:90,
+        word:word,
+        bottomWord:bottomWord,
+        passed:false
+    });
+}
+
+/* =========================
+   PARTICLES
+========================= */
+
+function addParticles() {
+    for(let i=0;i<3;i++) {
+        particles.push({
+            x:player.x,
+            y:player.y,
+            size:Math.random()*8+3,
+            life:30
+        });
+    }
+}
+
+function drawParticles() {
+    for(let i=particles.length-1;i>=0;i--) {
+        const p=particles[i];
+
+        ctx.globalAlpha=p.life/30;
+        ctx.font=`${p.size}px Arial`;
+        ctx.fillText("💕",p.x,p.y);
+
+        p.y+=1;
+        p.life--;
+
+        if(p.life<=0) {
+            particles.splice(i,1);
+        }
+    }
+
+    ctx.globalAlpha=1;
+}
+
+/* =========================
+   START GAME
+========================= */
+
+function startGame() {
+    playClick();
+
+    startScreen.classList.add("hidden");
+    gameOverScreen.classList.add("hidden");
+    winScreen.classList.add("hidden");
+    letterScreen.classList.add("hidden");
+
+    if(animationId!==null) {
+        cancelAnimationFrame(animationId);
+    }
+
+    player=createPlayer();
+
+    obstacles=[];
+    particles=[];
+
+    score=0;
+    frame=0;
+
+    scoreText.textContent=score;
+
+    gameRunning=true;
+
+    createObstacle();
+
+    animationId=requestAnimationFrame(gameLoop);
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+function fly() {
+    if(!gameRunning) return;
+
+    player.velocity=JUMP;
+
+    sound(650,0.07);
+    addParticles();
+}
+
+canvas.addEventListener("pointerdown",function(e) {
+    e.preventDefault();
+    fly();
+});
+
+document.addEventListener("keydown",function(e) {
+    if(e.code==="Space") {
+        e.preventDefault();
+        fly();
+    }
+});
+
+/* =========================
+   COLLISION
+========================= */
+
+function collision(o) {
+    const left=player.x-12;
+    const right=player.x+12;
+    const top=player.y-12;
+    const bottom=player.y+12;
+
+    const touchingX=
+        right>o.x && left<o.x+o.width;
+
+    const touchingTop=top<o.top;
+
+    const touchingBottom=
+        bottom>o.top+o.gap;
+
+    return touchingX &&
+        (touchingTop||touchingBottom);
+}
+
+/* =========================
+   GAME OVER
+========================= */
+
+function endGame() {
+    if(!gameRunning) return;
+
+    gameRunning=false;
+
+    playCrash();
+
+    gameOverScreen.classList.remove("hidden");
+}
+
+/* =========================
+   WIN GAME
+========================= */
+
+function winGame() {
+    if(!gameRunning) return;
+
+    gameRunning=false;
+
+    playScore();
+
+    winScreen.classList.remove("hidden");
+}
+
+/* =========================
+   GAME LOOP
+========================= */
+
+function gameLoop() {
+    if(!gameRunning) return;
+
+    frame++;
+
+    drawBackground();
+
+    player.velocity+=GRAVITY;
+    player.y+=player.velocity;
+
+    if(
+        player.y+player.size>H ||
+        player.y-player.size<0
+    ) {
+        endGame();
+        return;
+    }
+
+    if(frame%105===0) {
+        createObstacle();
+    }
+
+    for(let i=obstacles.length-1;i>=0;i--) {
+        const o=obstacles[i];
+
+        o.x-=2.5;
+
+        drawObstacle(o);
+
+        if(collision(o)) {
+            endGame();
+            return;
+        }
+
+        if(!o.passed && o.x+o.width<player.x) {
+            o.passed=true;
+
+            score++;
+            scoreText.textContent=score;
+
+            playScore();
+
+            if(score>=WIN_SCORE) {
+                winGame();
+                return;
+            }
+        }
+
+        if(o.x+o.width<0) {
+            obstacles.splice(i,1);
+        }
+    }
+
+    drawParticles();
+    drawHeart(player.x,player.y,player.size);
+
+    animationId=requestAnimationFrame(gameLoop);
+}
+
+/* =========================
+   LOVE LETTER
+========================= */
+
+function showLetter() {
+    playClick();
+
+    winScreen.classList.add("hidden");
+    letterScreen.classList.remove("hidden");
+}
+
+function closeLetter() {
+    playClick();
+
+    letterScreen.classList.add("hidden");
+    startScreen.classList.remove("hidden");
+}
+
+/* =========================
+   IDLE ANIMATION
+========================= */
+
+function idleAnimation() {
+    if(gameRunning) return;
+
+    frame++;
+
+    drawBackground();
+
+    const idleY=
+        H*0.48+Math.sin(frame*0.06)*12;
+
+    drawHeart(W*0.5,idleY,22);
+
+    animationId=requestAnimationFrame(idleAnimation);
+}
+
+idleAnimation();
+
+</script>
+
+</body>
+</html>
